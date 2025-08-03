@@ -1,0 +1,83 @@
+:root {
+    --mocha-primary: #b4befe;
+    --mocha-hover: #74c7ec;
+    --mocha-text: #cdd6f4;
+    --mocha-surface: #1e1e2e;
+    --mocha-shadow: rgba(108, 112, 134, 0.15);
+
+    /* Door Open */
+    --mocha-green: #a6e3a1;
+    --mocha-green-hover: #94d78e;
+
+    /* Door Close */
+    --mocha-red: #f38ba8;
+    --mocha-red-hover: #ec6a90;
+
+    /* Door Puase */
+    --mocha-pause: #fab387;
+    --mocha-pause-hover: #f9a97f;
+
+    /* Door Resume */
+    --mocha-resume: #89dceb;
+    --mocha-resume-hover: #74c7ec;
+
+    /* Door Camera */
+    --mocha-camera: #f5c2e7;
+    --mocha-camera-hover: #eba8d3;
+}
+
+body {
+    background-color: var(--mocha-surface);
+    color: var(--mocha-text);
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    margin: 2rem;
+}
+
+.button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    cursor: pointer;
+    box-shadow: 0 2px 4px var(--mocha-shadow);
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    margin-bottom: 10px;
+}
+
+.button:hover {
+    background-color: var(--mocha-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--mocha-shadow);
+}
+
+.button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px var(--mocha-shadow);
+}
+
+.button.open {
+    background-color: var(--mocha-green);
+    color: var(--mocha-surface);
+}
+
+.button.close {
+    background-color: var(--mocha-red);
+    color: var(--mocha-surface);
+}
+
+.button.pause {
+    background-color: var(--mocha-pause);
+    color: var(--mocha-pause);
+}
+
+.button.resume {
+    background-color: var(--mocha-resume);
+    color: var(--mocha-resume);
+}
+
+.button.camera {
+    background-color: var(--mocha-camera);
+    color: var(--mocha-camera);
+}

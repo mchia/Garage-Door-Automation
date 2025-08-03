@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/main.css') }}">
+</head>
+
+<body>
+    <h1 class="h1">WomTron</h1>
+    <div>
+        <button id="openDoor" class="button open">
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Garage"></use>
+            </svg>
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Up"></use>
+            </svg>
+        </button>
+    </div>
+
+    <div>
+        <button id="closeDoor" class="button close">
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Garage"></use>
+            </svg>
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Down"></use>
+            </svg>
+        </button>
+    </div>
+
+    <div>
+        <button id="pauseDoor" class="button pause">
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Garage"></use>
+            </svg>
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Pause"></use>
+            </svg>
+        </button>
+    </div>
+
+    <div>
+        <button id="resumeDoor" class="button resume">
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Garage"></use>
+            </svg>
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Resume"></use>
+            </svg>
+        </button>
+    </div>
+
+    <div>
+        <button id="cameraView" class="button camera">
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Garage"></use>
+            </svg>
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Camera"></use>
+            </svg>
+        </button>
+    </div>
+
+</body>
+
+<script type="module">
+    import sendCommand from '/static/JavaScript/garageControl.js';
+    document.querySelectorAll("button").forEach(button => {
+            button.addEventListener("click", () => sendCommand(button.id));
+        });
+</script>
+
+</html>
