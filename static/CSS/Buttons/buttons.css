@@ -1,38 +1,8 @@
-:root {
-    --mocha-primary: #b4befe;
-    --mocha-hover: #74c7ec;
-    --mocha-text: #cdd6f4;
-    --mocha-surface: #1e1e2e;
-    --mocha-shadow: rgba(108, 112, 134, 0.15);
-
-    /* Door Open */
-    --mocha-green: #a6e3a1;
-    --mocha-green-hover: #94d78e;
-
-    /* Door Close */
-    --mocha-red: #f38ba8;
-    --mocha-red-hover: #ec6a90;
-
-    /* Door Puase */
-    --mocha-pause: #fab387;
-    --mocha-pause-hover: #f9a97f;
-
-    /* Door Resume */
-    --mocha-resume: #89dceb;
-    --mocha-resume-hover: #74c7ec;
-
-    /* Door Camera */
-    --mocha-camera: #f5c2e7;
-    --mocha-camera-hover: #eba8d3;
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex;
 }
-
-body {
-    background-color: var(--mocha-surface);
-    color: var(--mocha-text);
-    font-family: 'Segoe UI', Roboto, sans-serif;
-    margin: 2rem;
-}
-
 .button {
     padding: 10px 20px;
     border: none;
@@ -80,4 +50,31 @@ body {
 .button.camera {
     background-color: var(--mocha-camera);
     color: var(--mocha-camera);
+}
+
+input[type="password"],
+input[type="text"] {
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--panel-color);
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    width: 250px;
+    font-size: 1rem;
+}
+
+.button.login {
+    padding: 10px 20px;
+    background-color: var(--accent-color);
+    color: var(--bg-color);
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button.login:hover {
+    background-color: #a6d189;
 }

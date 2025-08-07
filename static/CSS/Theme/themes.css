@@ -1,0 +1,48 @@
+:root {
+    --mocha-primary: #b4befe;
+    --mocha-hover: #74c7ec;
+    --mocha-text: #cdd6f4;
+    --mocha-surface: #1e1e2e;
+    --mocha-shadow: rgba(108, 112, 134, 0.15);
+    --bg-color: #1e1e2e;
+    --panel-color: #313244;
+    --accent-color: #cba6f7;
+    --text-color: #f5e0dc;
+    --font-family: 'Segoe UI', sans-serif;
+
+    /* Door Open */
+    --mocha-green: #a6e3a1;
+    --mocha-green-hover: #94d78e;
+
+    /* Door Close */
+    --mocha-red: #f38ba8;
+    --mocha-red-hover: #ec6a90;
+
+    /* Door Puase */
+    --mocha-pause: #fab387;
+    --mocha-pause-hover: #f9a97f;
+
+    /* Door Resume */
+    --mocha-resume: #89dceb;
+    --mocha-resume-hover: #74c7ec;
+
+    /* Door Camera */
+    --mocha-camera: #f5c2e7;
+    --mocha-camera-hover: #eba8d3;
+}
+
+body {
+    background-color: var(--mocha-surface);
+    color: var(--mocha-text);
+    font-family: var(--font-family);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+h1 {
+    margin-bottom: 1rem;
+}
