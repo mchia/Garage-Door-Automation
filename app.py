@@ -13,7 +13,6 @@ from flask import (
     render_template
 )
 
-
 class GarageAutomation:
     def __init__(self) -> None:
         self.app: Flask = Flask(__name__)
@@ -31,15 +30,29 @@ class GarageAutomation:
         self.app.add_url_rule(rule='/cameraView', view_func=self.cameraView, methods=["GET"])
 
     def launchPage(self) -> str:
+        """
+        Method to render the login page.
+        """
         return render_template(template_name_or_list='login.html')
     
     def launchDashboard(self) -> str:
+        """
+        Method to redirect user to login page if logged_in flag is False.
+        Otherwisem user will be redirected to the dashboard.
+        """
         if not session.get("logged_in"):
             return redirect("/")
 
         return render_template(template_name_or_list='dashboard.html', user=self.user)
 
     def validateLogin(self) -> Response:
+        """
+        Method to validate login credentials against a sqlite database.
+        Password is encoded with bcrypt.
+
+        Returns:
+            Response containing login status.
+        """
         data: Any = request.get_json()
         username: str = data.get("username")
         password_raw: str = data.get("password")
@@ -48,7 +61,6 @@ class GarageAutomation:
             return jsonify({"status": "fail", "message": "Missing username or password"}), 400
 
         pwd_attempted: bytes = password_raw.encode('utf-8')
-
         conn: sqlite3.Connection = sqlite3.connect("db/users.db")
         cursor: sqlite3.Cursor = conn.cursor()
 
@@ -93,4 +105,5 @@ class GarageAutomation:
         self.app.run(debug=True)
 
 if __name__ == "__main__":
-    GarageAutomation().run()
+    garage_app: GarageAutomation = GarageAutomation()
+    app: Flask = garage_app.app
