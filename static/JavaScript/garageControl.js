@@ -1,4 +1,5 @@
 export default function sendCommand(commandId) {
+    console.log(commandId)
     fetch(`/${commandId}`, {
         method: 'GET'
     })

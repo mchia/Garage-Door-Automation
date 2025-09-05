@@ -37,14 +37,12 @@
     color: var(--mocha-surface);
 }
 
-.button.pause {
-    background-color: var(--mocha-pause);
-    color: var(--mocha-pause);
-}
-
-.button.resume {
-    background-color: var(--mocha-resume);
-    color: var(--mocha-resume);
+/* button.css */
+.button.homepage {
+    background-color: var(--mocha-homepage);
+    border: none;
+    border-radius: 6px;
+    padding: 8px;
 }
 
 .button.camera {

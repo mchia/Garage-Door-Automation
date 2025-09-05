@@ -9,40 +9,8 @@
 <body>
     <h1 class="h1">Welcome {{ user }}</h1>
     <div>
-        <button id="openDoor" class="button open">
-            <svg class="svgIcons">
-                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Garage"></use>
-            </svg>
-            <svg class="svgIcons">
-                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Up"></use>
-            </svg>
-        </button>
-    </div>
-
-    <div>
-        <button id="closeDoor" class="button close">
-            <svg class="svgIcons">
-                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Garage"></use>
-            </svg>
-            <svg class="svgIcons">
-                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Down"></use>
-            </svg>
-        </button>
-    </div>
-
-    <div>
-        <button id="pauseDoor" class="button pause">
-            <svg class="svgIcons">
-                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Garage"></use>
-            </svg>
-            <svg class="svgIcons">
-                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Pause"></use>
-            </svg>
-        </button>
-    </div>
-
-    <div>
-        <button id="resumeDoor" class="button resume">
+        <!-- Button to Toggle the Garage Door -->
+        <button id="gpioToggle" class="button open">
             <svg class="svgIcons">
                 <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Garage"></use>
             </svg>
@@ -52,13 +20,22 @@
         </button>
     </div>
 
+    <!-- Button to launch camera live view -->
     <div>
-        <button id="cameraView" class="button camera">
+        <button id="launchLiveView" class="button camera" onclick="location.href='/liveView'">
             <svg class="svgIcons">
                 <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Garage"></use>
             </svg>
             <svg class="svgIcons">
                 <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Camera"></use>
+            </svg>
+        </button>
+    </div>
+
+    <div>
+        <button id="ip_find">
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Garage"></use>
             </svg>
         </button>
     </div>

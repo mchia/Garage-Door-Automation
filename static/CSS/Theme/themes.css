@@ -18,13 +18,9 @@
     --mocha-red: #f38ba8;
     --mocha-red-hover: #ec6a90;
 
-    /* Door Puase */
-    --mocha-pause: #fab387;
-    --mocha-pause-hover: #f9a97f;
-
-    /* Door Resume */
-    --mocha-resume: #89dceb;
-    --mocha-resume-hover: #74c7ec;
+    /* Homepage */
+    --mocha-homepage: #fab387;
+    --mocha-homepage-hover: #f9a97f;
 
     /* Door Camera */
     --mocha-camera: #f5c2e7;

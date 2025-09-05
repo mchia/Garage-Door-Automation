@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/main.css') }}">
+    <title>Garage Live View</title>
+</head>
+<body>
+    <div class="layout-grid">
+    <h1 class="header">Garage Live View</h1>
+    
+    <!-- This remains in the grid for layout purposes -->
+    <div class="home-button"></div>
+    
+    <div class="camera-container">
+        <img src="/cameraView" width="640" height="480" class="camera-feed" />
+        <!-- Move the button here for positioning -->
+        <button class="button homepage" onclick="location.href='/dashboard'">
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Homepage"></use>
+            </svg>
+        </button>
+    </div>
+</div>
+</body>
+</html>

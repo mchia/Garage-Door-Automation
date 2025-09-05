@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (result.status === 'success') {
             status.textContent = "Login successful!";
             status.style.color = "green";
-            window.location.href = "/launchDashboard";
+            window.location.href = "/dashboard";
         } else {
             status.textContent = result.message || "Login failed";
             status.style.color = "red";
