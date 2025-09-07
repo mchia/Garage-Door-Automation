@@ -33,9 +33,12 @@
     </div>
 
     <div>
-        <button id="ip_find">
+        <button id="launchLogs" class="button logs" onclick="location.href='/logbook'">
             <svg class="svgIcons">
                 <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Garage"></use>
+            </svg>
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Logbook"></use>
             </svg>
         </button>
     </div>

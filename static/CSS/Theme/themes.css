@@ -12,19 +12,15 @@
 
     /* Door Open */
     --mocha-green: #a6e3a1;
-    --mocha-green-hover: #94d78e;
 
-    /* Door Close */
-    --mocha-red: #f38ba8;
-    --mocha-red-hover: #ec6a90;
+    /* Logs */
+    --mocha-logs: #f9d29d;
 
     /* Homepage */
     --mocha-homepage: #fab387;
-    --mocha-homepage-hover: #f9a97f;
 
     /* Door Camera */
     --mocha-camera: #f5c2e7;
-    --mocha-camera-hover: #eba8d3;
 }
 
 body {
@@ -37,6 +33,7 @@ body {
     justify-content: center;
     height: 100vh;
     margin: 0;
+    padding: 0;
 }
 
 h1 {

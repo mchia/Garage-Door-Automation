@@ -3,51 +3,43 @@
     flex-direction: column;
     align-items: flex;
 }
+
 .button {
-    padding: 10px 20px;
+    padding: 5px 10px;
     border: none;
     border-radius: 6px;
-    font-size: 15px;
-    font-weight: 500;
-    font-family: 'Segoe UI', Roboto, sans-serif;
     cursor: pointer;
-    box-shadow: 0 2px 4px var(--mocha-shadow);
-    transition: background-color 0.3s ease, transform 0.1s ease;
-    margin-bottom: 10px;
-}
-
-.button:hover {
-    background-color: var(--mocha-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px var(--mocha-shadow);
-}
-
-.button:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 2px var(--mocha-shadow);
 }
 
 .button.open {
     background-color: var(--mocha-green);
     color: var(--mocha-surface);
-}
-
-.button.close {
-    background-color: var(--mocha-red);
-    color: var(--mocha-surface);
-}
-
-/* button.css */
-.button.homepage {
-    background-color: var(--mocha-homepage);
-    border: none;
-    border-radius: 6px;
-    padding: 8px;
+    margin-bottom: 10px;
 }
 
 .button.camera {
     background-color: var(--mocha-camera);
     color: var(--mocha-camera);
+    margin-bottom: 10px;
+}
+
+.button.logs {
+    background-color: var(--mocha-logs);
+    color: var(--mocha-surface);
+    margin-bottom: 10px;
+}
+
+/* button.css */
+.button.homepage {
+    background-color: var(--mocha-homepage);
+    color: var(--mocha-homepage);
+    border: none;
+}
+
+.button.homepageLogs {
+    background-color: var(--mocha-homepage);
+    color: var(--mocha-homepage);
+    border: none;
 }
 
 input[type="password"],

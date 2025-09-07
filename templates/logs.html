@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="{{ url_for('static', filename='CSS/main.css') }}">
+
+</head>
+    <body>
+        <div class="layout-grid-cards">
+            <h1 class="card-header">Login History</h1>
+            <button class="button homepageLogs" onclick="location.href='/dashboard'">
+                <svg class="homepageSVG">
+                    <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Homepage"></use>
+                </svg>
+            </button>
+        </div>
+        <div class="log-container">
+            {% for row in rows %}
+            <div class="log-card">
+                <div class="log-summary">
+                    <span><span class="username">{{ row.username }}</span>: {{ row.login_date }} {{ row.login_time }}</span>
+                    <svg class="expand-btn" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M7 10l5 5 5-5z"/>
+                    </svg>
+                </div>
+                <div class="log-details">
+                    <div><span class="label">IP Address:</span> <span class="value">{{ row.ip_address }}</span></div>
+                    <div><span class="label">City:</span> <span class="value">{{ row.city }}</span></div>
+                    <div><span class="label">Region:</span> <span class="value">{{ row.region }}</span></div>
+                    <div><span class="label">Country:</span> <span class="value">{{ row.country }}</span></div>
+                    <div><span class="label">Browser:</span> <span class="value">{{ row.browser }}</span></div>
+                    <div><span class="label">OS:</span> <span class="value">{{ row.os }}</span></div>
+                    <div><span class="label">Device:</span> <span class="value">{{ row.device }}</span></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="pagination"></div>
+
+        <script src="{{ url_for('static', filename='JavaScript/pagination.js') }}"></script>
+    </body>
+</html>

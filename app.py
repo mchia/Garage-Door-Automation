@@ -38,9 +38,10 @@ class GarageAutomation:
 
         self.app.add_url_rule(rule='/gpioToggle', view_func=self.gpioToggle, methods=["GET"])
         self.app.add_url_rule(rule='/liveView', view_func=self.launchLiveView)
-        self.app.add_url_rule(rule='/cameraView', view_func=self.cameraView)
-        self.app.add_url_rule(rule='/ip_find', view_func=self.ip_find, methods=["GET"])
+        self.app.add_url_rule(rule='/logbook', view_func=self.launchLogs)
+        # self.app.add_url_rule(rule='/cameraView', view_func=self.cameraView)
 
+    # HTML Views #
     def launchPage(self) -> str:
         """
         Method to render the login page.
@@ -57,6 +58,20 @@ class GarageAutomation:
 
         return render_template(template_name_or_list='dashboard.html', user=self.user)
 
+    def launchLiveView(self) -> str:
+        if not session.get("logged_in"):
+            return redirect("/")
+
+        return render_template(template_name_or_list='liveView.html')
+
+    def launchLogs(self) -> str:
+        if not session.get("logged_in"):
+            return redirect("/")
+
+        rows: list[Any] = self.retrieve_logs()
+        return render_template(template_name_or_list='logs.html', rows=rows)
+
+    # Picamera2 Controls #
     # def start_camera(self) -> None:
     #     if self.picam2 is None:
     #         self.picam2: Picamera2 = Picamera2()
@@ -68,12 +83,61 @@ class GarageAutomation:
     #         self.picam2.close()
     #         self.picam2: Optional[Picamera2] = None
 
-    def launchLiveView(self) -> str:
-        if not session.get("logged_in"):
-            return redirect("/")
+    # def cameraView(self) -> Response:
+    #     """
+    #     Produces a live view of camera by calling generate_frames() to continuously return bytes.
 
-        return render_template(template_name_or_list='liveView.html')
+    #     Returns:
+    #         Response containing jpeg bytes and mimetype (Type of content contained in HTTP response)
+    #         'multipart/x-mixed-replace' sends multiple parts of the stream in the same connection and replaces the previous one.
+    #         'boundary=frame' is a delimiter, in this case the delimiter is frames.
+    #     """
 
+    #     self.start_camera()
+
+    #     def generate_frames() -> Iterator[bytes]:
+    #         """
+    #         Function to access piCamera module on Raspberry PI :
+    #             1) Capture a single frame as a NumPy array.
+    #             2) Encode the captured NumPy array as JPEG (Skip if encoding fails).
+    #             3) Converts encoded JPEG frames into bytes.
+    #             4) Yields each captured frame and sends back to camera to display live feed.
+
+    #         Yields to retain function state unlike 'return' which has to restart.
+    #         Yield continues from previous yield until stoppped -> More memory efficient.
+    #         """
+    #         while True:
+    #             frame: np.ndarray = self.picam2.capture_array()
+    #             ret, jpeg = cv2.imencode('.jpg', frame)
+    #             if not ret:
+    #                 continue
+    #             frame_bytes: bytes = jpeg.tobytes()
+    #             yield (b'--frame\r\n'
+    #                 b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+
+    #     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+    # Pin Controls #
+    def get_relay(self) -> OutputDevice:
+        self.relay = OutputDevice(pin=17, active_high=True, initial_value=False)
+
+        return self.relay
+
+    def gpioToggle(self):
+        try:
+            relay: OutputDevice = self.get_relay()
+            relay.on()
+            sleep(0.5)
+            relay.off()
+            relay.close()
+        except Exception as e:
+            print(e)
+        finally:
+            self.relay: OutputDevice = None
+
+        return Response(status=200)
+
+    # DB Calls #
     def validateLogin(self) -> Response:
         """
         Method to validate login credentials against a sqlite database.
@@ -113,59 +177,6 @@ class GarageAutomation:
         else:
             return jsonify({"status": "fail", "message": "Invalid credentials"}), 400
 
-    def get_relay(self) -> OutputDevice:
-        self.relay = OutputDevice(pin=17, active_high=True, initial_value=False)
-
-        return self.relay
-
-    def gpioToggle(self):
-        try:
-            relay: OutputDevice = self.get_relay()
-            relay.on()
-            sleep(0.5)
-            relay.off()
-            relay.close()
-        except Exception as e:
-            print(e)
-        finally:
-            self.relay: OutputDevice = None
-
-        return Response(status=200)
-
-    def cameraView(self) -> Response:
-        """
-        Produces a live view of camera by calling generate_frames() to continuously return bytes.
-
-        Returns:
-            Response containing jpeg bytes and mimetype (Type of content contained in HTTP response)
-            'multipart/x-mixed-replace' sends multiple parts of the stream in the same connection and replaces the previous one.
-            'boundary=frame' is a delimiter, in this case the delimiter is frames.
-        """
-
-        self.start_camera()
-
-        def generate_frames() -> Iterator[bytes]:
-            """
-            Function to access piCamera module on Raspberry PI :
-                1) Capture a single frame as a NumPy array.
-                2) Encode the captured NumPy array as JPEG (Skip if encoding fails).
-                3) Converts encoded JPEG frames into bytes.
-                4) Yields each captured frame and sends back to camera to display live feed.
-
-            Yields to retain function state unlike 'return' which has to restart.
-            Yield continues from previous yield until stoppped -> More memory efficient.
-            """
-            while True:
-                frame: np.ndarray = self.picam2.capture_array()
-                ret, jpeg = cv2.imencode('.jpg', frame)
-                if not ret:
-                    continue
-                frame_bytes: bytes = jpeg.tobytes()
-                yield (b'--frame\r\n'
-                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
-
-        return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
     def store_login_data(self, cursor: sqlite3.Cursor) -> None:
         """
         Method to write login data to database.
@@ -182,6 +193,7 @@ class GarageAutomation:
         user_id: str | None = user_id_row[0] if user_id_row else None
         user_data: dict[str, str | float | None] = self.user_info()
         ip_data: dict[str, str | float | None] = self.ip_find()
+        loginTime: list[str] = datetime.now().isoformat(sep=" ").split(" ")
 
         # Store login details
         cursor.execute(
@@ -189,6 +201,7 @@ class GarageAutomation:
             INSERT INTO logbook (
                 user_id,
                 ip_address,
+                login_date,
                 login_time,
                 browser,
                 browser_version,
@@ -196,12 +209,13 @@ class GarageAutomation:
                 os_version,
                 device
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 user_id,
                 ip_data.get("ip_address"),
-                datetime.now().isoformat(sep=" "),
+                loginTime[0],
+                loginTime[1].split(".")[0],
                 user_data.get("browser"),
                 user_data.get("browser_version"),
                 user_data.get("os"),
@@ -231,6 +245,27 @@ class GarageAutomation:
             ),
         )
 
+    def retrieve_logs(self) -> list[Any]:
+        """
+        Method to query DB to display logbook of logins in a HTML table.
+
+        Returns
+            rows : list[Any]
+                Rows from the database in a python list.
+        """
+        conn: sqlite3.Connection = sqlite3.connect(self.db)
+        conn.row_factory = sqlite3.Row
+        cursor: sqlite3.Cursor = conn.cursor()
+
+        with open("db/logs.sql") as f:
+            sql: str = f.read()
+        cursor.execute(sql)
+        rows: list[Any] = cursor.fetchall()
+
+        conn.close()
+        return rows
+
+    # IP & User Metadata #
     def ip_find(self) -> dict[str, str | float | None]:
         """
         Method to record metedata related to IP addresses when a user logs in.
@@ -300,6 +335,7 @@ class GarageAutomation:
             "device": device
         }
 
+    # Run
     def run(self) -> None: 
         """
         Method that runs the Flask website.

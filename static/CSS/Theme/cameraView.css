@@ -1,11 +1,11 @@
 .layout-grid {
     display: grid;
-    grid-template-columns: 1fr auto; /* first column fills space, second fits button */
+    grid-template-columns: 1fr auto;
     grid-template-rows: auto 1fr;
     max-width: 640px;
     width: 100%;
     box-sizing: border-box;
-    position: relative; /* Add this */
+    position: relative;
 }
 
 .header {
@@ -24,7 +24,7 @@
 .camera-container {
     grid-column: 1 / span 2;
     grid-row: 2;
-    position: relative; /* Add this */
+    position: relative;
 }
 
 .camera-feed {
@@ -35,7 +35,6 @@
     display: block;
 }
 
-/* Add this new rule */
 .button.homepage {
     position: absolute;
     top: -60px;
