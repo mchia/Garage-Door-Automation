@@ -1,6 +1,5 @@
 import os
 import cv2
-import time
 import bcrypt
 import sqlite3
 import requests
