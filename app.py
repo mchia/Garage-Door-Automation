@@ -283,16 +283,16 @@ class GarageAutomation:
         # If IP is private, make a GET request to "https://api.ipify.org" to return the public address.
         if ip.startswith("127.") or ip.startswith("192.168.") or ip.startswith("10."):
             try:
-                public_ip: str = requests.get("https://api.ipify.org").text
+                ip: str = requests.get("https://api.ipify.org").text
             except:
-                public_ip: str = ip
+                ip: str = ip
 
         try:
-            ip_metadata: Response = requests.get(f"http://ipinfo.io/{public_ip}/json")
+            ip_metadata: Response = requests.get(f"http://ipinfo.io/{ip}/json")
             if ip_metadata.status_code == 200:
                 data: Optional[Any] = ip_metadata.json()
                 ip_data: dict[str, str | float] = {
-                    "ip_address": public_ip,
+                    "ip_address": ip,
                     "city": data.get("city"),
                     "region": data.get("region"),
                     "country": data.get("country"),
@@ -302,7 +302,7 @@ class GarageAutomation:
                 return ip_data
         except:
             ip_data: dict[str, str | None] = {
-                "ip": public_ip,
+                "ip": ip,
                 "city": None,
                 "region": None,
                 "country": None,
