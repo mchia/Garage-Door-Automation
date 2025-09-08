@@ -349,4 +349,4 @@ def create_app() -> Flask:
 app: Flask = create_app()
 
 if __name__ == "__main__":
-    app.run(debug=False, use_reloader=False, host="0.0.0.0", port=8000)
+    app.run(debug=False, use_reloader=False)
