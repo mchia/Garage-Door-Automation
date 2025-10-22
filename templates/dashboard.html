@@ -43,6 +43,21 @@
         </button>
     </div>
 
+    <!-- Button for Admin page only if user is admin -->
+    {% if role == 'admin' %}
+    <div>
+        <button id="launchAdmin" class="button admin" onclick="location.href='admin'"">
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Garage"></use>
+            </svg>
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#admin"></use>
+            </svg>
+        </button>
+    </div>
+    {% endif %}
+
+
 </body>
 
 <script type="module">

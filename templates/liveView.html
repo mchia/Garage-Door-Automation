@@ -8,20 +8,20 @@
 </head>
 <body>
     <div class="layout-grid">
-    <h1 class="header">Garage Live View</h1>
-    
-    <!-- This remains in the grid for layout purposes -->
-    <div class="home-button"></div>
-    
-    <div class="camera-container">
-        <img src="/cameraView" width="640" height="480" class="camera-feed" />
-        <!-- Move the button here for positioning -->
-        <button class="button homepage" onclick="location.href='/dashboard'">
-            <svg class="homepageSVG">
-                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Homepage"></use>
-            </svg>
-        </button>
+        <h1 class="header">Garage Live View</h1>
+        
+        <!-- This remains in the grid for layout purposes -->
+        <div class="home-button"></div>
+        
+        <div class="camera-container">
+            <img src="/cameraView" width="640" height="480" class="camera-feed" />
+            <!-- Move the button here for positioning -->
+            <button class="button homepage" onclick="location.href='/dashboard'">
+                <svg class="homepageSVG">
+                    <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Homepage"></use>
+                </svg>
+            </button>
+        </div>
     </div>
-</div>
 </body>
 </html>

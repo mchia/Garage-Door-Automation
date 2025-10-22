@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/main.css') }}">
+</head>
+<body>
+    <div class="content-container">
+        <div class="header-row">
+            <h1>Admin</h1>
+            <button class="button homepageLogs" onclick="location.href='/dashboard'">
+                <svg class="homepageSVG">
+                    <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Homepage"></use>
+                </svg>
+            </button>
+        </div>
+
+        <div class="button-row">
+            <button class="button adminSwitch" onclick="showForm('addUser')">Add Users</button>
+            <button class="button adminSwitch" onclick="showForm('removeUser')">Remove Users</button>
+        </div>
+
+        <form id="addUser" class="form-container" style="display: flex; flex-direction: column;">
+            <input type="text" placeholder="New Username" name="username" required>
+            <input type="text" placeholder="New Password" name="password" required>
+            <button id="addUserBtn" class="button login" type="submit">Add User</button>
+        </form>
+
+        <form id="removeUser" class="form-container" style="display: none; flex-direction: column;">
+            <label for="userRemoval">Select User:</label>
+            <select id="userRemoval" name="Remove" required>
+                {% for u in users %}
+                    <option value="{{ u }}">{{ u }}</option>
+                {% endfor %}
+            </select>
+            <button id="removeUserBtn" type="submit" class="button login">Remove User</button>
+        </form>
+    </div>
+
+<script>
+    function showForm(formId) {
+        const forms = ['addUser', 'removeUser'];
+        forms.forEach(id => {
+            document.getElementById(id).style.display = (id === formId) ? 'flex' : 'none';
+        });
+    }
+</script>
+
+<script src="{{ url_for('static', filename='JavaScript/userManagement.js') }}"></script>
+
+</body>
+</html>
