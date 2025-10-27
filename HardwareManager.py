@@ -5,7 +5,7 @@ from flask import Response
 from picamera2 import Picamera2
 from gpiozero import OutputDevice
 from contextlib import contextmanager
-from typing import Iterator, Optional, Generator, Callable
+from typing import Iterator, Optional, Callable
 
 class HardwareManager:
     def __init__(self, relay_pin: int = 17, hw_logger: Callable[[str, str], None] = None) -> None:

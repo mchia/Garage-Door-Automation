@@ -30,7 +30,7 @@ class GarageAutomation:
         self.app.add_url_rule(rule='/gpioToggle', view_func=self.hw.gpioToggle, methods=["GET"])
         self.app.add_url_rule(rule='/liveView', view_func=self.launchLiveView)
         self.app.add_url_rule(rule='/logbook', view_func=self.launchLogs)
-        # self.app.add_url_rule(rule='/cameraView', view_func=self.hw.cameraView)
+        self.app.add_url_rule(rule='/cameraView', view_func=self.hw.cameraView)
         self.app.add_url_rule(rule='/admin', view_func=self.launchAdmin)
 
     # HTML Views #
