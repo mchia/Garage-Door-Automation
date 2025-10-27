@@ -2,7 +2,7 @@
 from time import sleep
 import cv2, numpy as np
 from flask import Response
-# from picamera2 import Picamera2
+from picamera2 import Picamera2
 from gpiozero import OutputDevice
 from contextlib import contextmanager
 from typing import Iterator, Optional, Generator, Callable
@@ -10,7 +10,7 @@ from typing import Iterator, Optional, Generator, Callable
 class HardwareManager:
     def __init__(self, relay_pin: int = 17, hw_logger: Callable[[str, str], None] = None) -> None:
         self.relay_pin: int = relay_pin
-        # self.picam2: Optional[Picamera2] = None
+        self.picam2: Optional[Picamera2] = None
         self.hw_logger = hw_logger
 
     @contextmanager
@@ -49,48 +49,48 @@ class HardwareManager:
         else:
             return Response(status=200)
 
-    # @contextmanager
-    # def get_camera(self):
-    #     """
-    #     Context manager for the PiCamera2.
-    #     """
-    #     self.picam2: Picamera2 = Picamera2()
-    #     try:
-    #         yield self.picam2
-    #     finally:
-    #         if self.picam2:
-    #             self.picam2.close()
-    #         self.picam2 = None
+    @contextmanager
+    def get_camera(self):
+        """
+        Context manager for the PiCamera2.
+        """
+        self.picam2: Picamera2 = Picamera2()
+        try:
+            yield self.picam2
+        finally:
+            if self.picam2:
+                self.picam2.close()
+            self.picam2 = None
 
-    # def cameraView(self) -> Response:
-    #     """
-    #     Produces a live view of camera by calling generate_frames() to continuously return bytes.
+    def cameraView(self) -> Response:
+        """
+        Produces a live view of camera by calling generate_frames() to continuously return bytes.
 
-    #     Returns:
-    #         Response containing jpeg bytes and mimetype (Type of content contained in HTTP response)
-    #         'multipart/x-mixed-replace' sends multiple parts of the stream in the same connection and replaces the previous one.
-    #         'boundary=frame' is a delimiter, in this case the delimiter is frames.
-    #     """
+        Returns:
+            Response containing jpeg bytes and mimetype (Type of content contained in HTTP response)
+            'multipart/x-mixed-replace' sends multiple parts of the stream in the same connection and replaces the previous one.
+            'boundary=frame' is a delimiter, in this case the delimiter is frames.
+        """
 
-    #     def generate_frames(camera: Picamera2) -> Iterator[bytes]:
-    #         """
-    #         Function to access piCamera module on Raspberry PI :
-    #             1) Capture a single frame as a NumPy array.
-    #             2) Encode the captured NumPy array as JPEG (Skip if encoding fails).
-    #             3) Converts encoded JPEG frames into bytes.
-    #             4) Yields each captured frame and sends back to camera to display live feed.
+        def generate_frames(camera: Picamera2) -> Iterator[bytes]:
+            """
+            Function to access piCamera module on Raspberry PI :
+                1) Capture a single frame as a NumPy array.
+                2) Encode the captured NumPy array as JPEG (Skip if encoding fails).
+                3) Converts encoded JPEG frames into bytes.
+                4) Yields each captured frame and sends back to camera to display live feed.
 
-    #         Yields to retain function state unlike 'return' which has to restart.
-    #         Yield continues from previous yield until stoppped -> More memory efficient.
-    #         """
-    #         while True:
-    #             frame: np.ndarray = camera.capture_array()
-    #             ret, jpeg = cv2.imencode('.jpg', frame)
-    #             if not ret:
-    #                 continue
-    #             frame_bytes: bytes = jpeg.tobytes()
-    #             yield b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n'
+            Yields to retain function state unlike 'return' which has to restart.
+            Yield continues from previous yield until stoppped -> More memory efficient.
+            """
+            while True:
+                frame: np.ndarray = camera.capture_array()
+                ret, jpeg = cv2.imencode('.jpg', frame)
+                if not ret:
+                    continue
+                frame_bytes: bytes = jpeg.tobytes()
+                yield b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n'
 
-    #     with self.get_camera() as picam2:
-    #         return Response(generate_frames(camera=picam2), mimetype='multipart/x-mixed-replace; boundary=frame')
-
+        with self.get_camera() as picam2:
+            self.hw_logger(hardware='Garage Camera')
+            return Response(generate_frames(camera=picam2), mimetype='multipart/x-mixed-replace; boundary=frame')
