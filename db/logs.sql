@@ -1,4 +1,5 @@
 SELECT
+    lb.session_id,
     u.username,
     lb.login_date,
     lb.login_time,
