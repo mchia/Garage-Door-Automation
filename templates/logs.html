@@ -32,6 +32,13 @@
                     <div><span class="label">Browser:</span> <span class="value">{{ row.browser }}</span></div>
                     <div><span class="label">OS:</span> <span class="value">{{ row.os }}</span></div>
                     <div><span class="label">Device:</span> <span class="value">{{ row.device }}</span></div>
+
+                    {% for hw in hw_cols %}
+                    <div>
+                        <span class="label">{{ hw }}:</span>
+                        <span class="value">{{ row[hw] }}</span>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
             {% endfor %}

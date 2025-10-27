@@ -21,6 +21,9 @@
 
     /* Door Camera */
     --mocha-camera: #f5c2e7;
+
+    /* Admin Page */
+    --mocha-admin: #f38ba8;
 }
 
 body {

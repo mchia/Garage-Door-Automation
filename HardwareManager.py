@@ -5,12 +5,13 @@ from flask import Response
 # from picamera2 import Picamera2
 from gpiozero import OutputDevice
 from contextlib import contextmanager
-from typing import Iterator, Optional, Generator
+from typing import Iterator, Optional, Generator, Callable
 
 class HardwareManager:
-    def __init__(self, relay_pin: int = 17) -> None:
+    def __init__(self, relay_pin: int = 17, hw_logger: Callable[[str, str], None] = None) -> None:
         self.relay_pin: int = relay_pin
         # self.picam2: Optional[Picamera2] = None
+        self.hw_logger = hw_logger
 
     @contextmanager
     def get_relay(self):
@@ -42,6 +43,7 @@ class HardwareManager:
                 relay.on()
                 sleep(0.5)
                 relay.off()
+            self.hw_logger(hardware='Garage Door')
         except Exception:
             return Response(status=400)
         else:

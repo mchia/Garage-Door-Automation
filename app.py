@@ -17,7 +17,7 @@ class GarageAutomation:
 
         # Initialise Database and Hardware Managers
         self.db: dbm.dbManager = dbm.dbManager(ip_dict=self.ip_find, user_dict=self.user_info)
-        self.hw: hwm.HardwareManager = hwm.HardwareManager()
+        self.hw: hwm.HardwareManager = hwm.HardwareManager(hw_logger=self.db.hardware_logging)
 
         load_dotenv()
         self.app.secret_key = os.getenv(key='SECRET_KEY')
@@ -68,8 +68,8 @@ class GarageAutomation:
         if not session.get("logged_in"):
             return redirect("/")
 
-        rows: list[Any] = self.db.retrieve_logs()
-        return render_template(template_name_or_list='logs.html', rows=rows)
+        rows, hw_cols = self.db.retrieve_logs()
+        return render_template(template_name_or_list='logs.html', rows=rows, hw_cols=hw_cols)
 
     def launchAdmin(self) -> str|Response:
         if self.db.role == 'admin':
@@ -116,6 +116,7 @@ class GarageAutomation:
                     "longitude": float(data.get("loc").split(",")[1])
                 }
                 return ip_data
+
         except Exception:
             ip_data: dict[str, str | None] = {
                 "ip": ip,
@@ -149,6 +150,9 @@ class GarageAutomation:
             "os_version": os_version,
             "device": device
         }
+
+    def action_info(self) -> dict[Optional[str]]:
+        pass
 
     # Run
     def run(self) -> None: 

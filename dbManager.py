@@ -9,6 +9,7 @@ class dbManager:
         self.db: str = "db/users.db"
         self.ip_dict: Callable[[], dict] = ip_dict
         self.user_dict: Callable[[], dict] = user_dict
+        self.user_id: Optional[str] = None
         self.user: Optional[str] = None
         self.role: Optional[str] = None
         self.session_id: str = secrets.token_hex(nbytes=16)
@@ -33,6 +34,7 @@ class dbManager:
         finally:
             conn.close()
 
+    # Information Storage
     def validateLogin(self) -> Response:
         """
         Method to validate login credentials against a sqlite database.
@@ -64,6 +66,7 @@ class dbManager:
             if is_valid:
                 cursor.executescript(open("db/login.sql").read())
                 cursor.executescript(open("db/ip_logs.sql").read())
+                cursor.executescript(open("db/hardware_logs.sql").read())
                 self.user: str = username
                 self.role: str = result[1]
                 session["logged_in"] = True
@@ -88,83 +91,148 @@ class dbManager:
             cursor : sqlite3.Cursor
                 Cursor object to perfrom write operations.
         """
-        user_id_row: Any = cursor.execute(
-            "SELECT id FROM users WHERE username = ?",
-            (self.user,)
-        ).fetchone()
+        with self.db_connect() as cursor:
+            user_id: Any = cursor.execute(
+                    "SELECT id FROM users WHERE username = ?",
+                    (self.user,)
+                ).fetchone()
 
-        user_id: str | None = user_id_row[0] if user_id_row else None
-        user_data: dict[str, str | float | None] = self.user_metadata()
-        ip_data: dict[str, str | float | None] = self.ip_metadata()
-        loginTime: list[str] = datetime.now().isoformat(sep=" ").split(" ")
+            self.user_id: str | None = user_id[0] if user_id else None
+            user_data: dict[str, str | float | None] = self.user_metadata()
+            ip_data: dict[str, str | float | None] = self.ip_metadata()
+            loginTime: list[str] = datetime.now().isoformat(sep=" ").split(" ")
 
-        # Store login details
-        cursor.execute(
-            """
-            INSERT INTO logbook (
-                user_id,
-                session_id,
-                ip_address,
-                login_date,
-                login_time,
-                browser,
-                browser_version,
-                os,
-                os_version,
-                device
+            # Store login details
+            cursor.execute(
+                """
+                INSERT INTO logbook (
+                    user_id,
+                    session_id,
+                    ip_address,
+                    login_date,
+                    login_time,
+                    browser,
+                    browser_version,
+                    os,
+                    os_version,
+                    device
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    self.user_id,
+                    self.session_id,
+                    ip_data.get("ip_address"),
+                    loginTime[0],
+                    loginTime[1].split(".")[0],
+                    user_data.get("browser"),
+                    user_data.get("browser_version"),
+                    user_data.get("os"),
+                    user_data.get("os_version"),
+                    user_data.get("device"),
+                ),
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                user_id,
-                self.session_id,
-                ip_data.get("ip_address"),
-                loginTime[0],
-                loginTime[1].split(".")[0],
-                user_data.get("browser"),
-                user_data.get("browser_version"),
-                user_data.get("os"),
-                user_data.get("os_version"),
-                user_data.get("device"),
-            ),
-        )
 
-        # Store unique IP address details
-        cursor.execute("""
-            INSERT OR IGNORE INTO ip_logs (
-                ip_address,
-                city,
-                region,
-                country,
-                latitude,
-                longitude
+            # Store unique IP address details
+            cursor.execute("""
+                INSERT OR IGNORE INTO ip_logs (
+                    ip_address,
+                    city,
+                    region,
+                    country,
+                    latitude,
+                    longitude
+                )
+                VALUES (?, ?, ?, ?, ?, ?)
+                """, (
+                    ip_data.get("ip_address"),
+                    ip_data.get("city"),
+                    ip_data.get("region"),
+                    ip_data.get("country"),
+                    ip_data.get("latitude"),
+                    ip_data.get("longitude"),
+                ),
             )
-            VALUES (?, ?, ?, ?, ?, ?)
-            """, (
-                ip_data.get("ip_address"),
-                ip_data.get("city"),
-                ip_data.get("region"),
-                ip_data.get("country"),
-                ip_data.get("latitude"),
-                ip_data.get("longitude"),
-            ),
-        )
 
-    def retrieve_logs(self) -> list[Any]:
+    def hardware_logging(self, hardware: str) -> None:
+        try:
+            with self.db_connect() as cursor:
+                cursor.execute("""
+                    INSERT INTO hardware_logs (
+                        session_id,
+                        user_id,
+                        timestamp,
+                        hardware
+                    )
+                    VALUES
+                    (?, ?, ?, ?)
+                    """,
+                    (
+                        self.session_id,
+                        self.user_id,
+                        datetime.now().isoformat(sep=" "),
+                        hardware
+                    )
+                )
+                return jsonify({"status": "success"}), 200
+        except Exception:
+            return jsonify({"status": "fail", "message": Exception}), 400
+
+    # User Management Functions
+    def retrieve_logs(self) -> tuple[list[Any], list[str]]:
         """
-        Method to query DB to display logbook of logins in a HTML table.
+        Method to query database for relevant information to show in a HTML card.
 
         Returns
             rows : list[Any]
-                Rows from the database in a python list.
+                A list of values returned by SQL.
         """
         with self.db_connect() as cursor:
             with open("db/logs.sql") as f:
-                sql: str = f.read()
-            cursor.execute(sql)
+                main_sql: str = f.read().strip()
+
+            cursor.execute("SELECT DISTINCT hardware FROM hardware_logs")
+            hardware_types: list[str] = [row[0] for row in cursor.fetchall()]
+
+            # Escape single quotes in hardware names
+            def esc(h: str) -> str:
+                return h.replace("'", "''")
+
+            sum_cases: str = ",\n".join(
+                f"SUM(CASE WHEN hardware = '{esc(h)}' THEN 1 ELSE 0 END) AS '{esc(h)}'"
+                for h in hardware_types
+            )
+
+            hardware_query: str = f"""
+                SELECT
+                    session_id,
+                    {sum_cases}
+                FROM hardware_logs
+                GROUP BY session_id
+            """
+
+            # Exclude session_id columns from both queries
+            cursor.execute(f"SELECT * FROM ({main_sql}) LIMIT 1")
+            main_cols: list[str] = [c[0] for c in cursor.description if c[0] != "session_id"]
+
+            cursor.execute(f"SELECT * FROM ({hardware_query}) LIMIT 1")
+            hw_cols: list[str] = [c[0] for c in cursor.description if c[0] != "session_id"]
+
+            final_query: str = f"""
+                SELECT
+                    {', '.join(['ms.' + c for c in main_cols] + [f'hq."{c}"' for c in hw_cols])}
+                FROM
+                    ({main_sql}) ms
+                INNER JOIN
+                    ({hardware_query}) hq
+                ON
+                    ms.session_id = hq.session_id
+            """
+
+            cursor.execute(final_query)
             rows: list[Any] = cursor.fetchall()
 
-        return rows
+            return rows, hw_cols
 
     def userList(self) -> list[str]:
         """
