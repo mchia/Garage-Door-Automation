@@ -91,68 +91,67 @@ class dbManager:
             cursor : sqlite3.Cursor
                 Cursor object to perfrom write operations.
         """
-        with self.db_connect() as cursor:
-            user_id: Any = cursor.execute(
-                    "SELECT id FROM users WHERE username = ?",
-                    (self.user,)
-                ).fetchone()
+        user_id: Any = cursor.execute(
+            "SELECT id FROM users WHERE username = ?",
+            (self.user,)
+        ).fetchone()
 
-            self.user_id: str | None = user_id[0] if user_id else None
-            user_data: dict[str, str | float | None] = self.user_metadata()
-            ip_data: dict[str, str | float | None] = self.ip_metadata()
-            loginTime: list[str] = datetime.now().isoformat(sep=" ").split(" ")
+        self.user_id: str | None = user_id[0] if user_id else None
+        user_data: dict[str, str | float | None] = self.user_metadata()
+        ip_data: dict[str, str | float | None] = self.ip_metadata()
+        loginTime: list[str] = datetime.now().isoformat(sep=" ").split(" ")
 
-            # Store login details
-            cursor.execute(
-                """
-                INSERT INTO logbook (
-                    user_id,
-                    session_id,
-                    ip_address,
-                    login_date,
-                    login_time,
-                    browser,
-                    browser_version,
-                    os,
-                    os_version,
-                    device
-                )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    self.user_id,
-                    self.session_id,
-                    ip_data.get("ip_address"),
-                    loginTime[0],
-                    loginTime[1].split(".")[0],
-                    user_data.get("browser"),
-                    user_data.get("browser_version"),
-                    user_data.get("os"),
-                    user_data.get("os_version"),
-                    user_data.get("device"),
-                ),
+        # Store login details
+        cursor.execute(
+            """
+            INSERT INTO logbook (
+                user_id,
+                session_id,
+                ip_address,
+                login_date,
+                login_time,
+                browser,
+                browser_version,
+                os,
+                os_version,
+                device
             )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                self.user_id,
+                self.session_id,
+                ip_data.get("ip_address"),
+                loginTime[0],
+                loginTime[1].split(".")[0],
+                user_data.get("browser"),
+                user_data.get("browser_version"),
+                user_data.get("os"),
+                user_data.get("os_version"),
+                user_data.get("device"),
+            ),
+        )
 
-            # Store unique IP address details
-            cursor.execute("""
-                INSERT OR IGNORE INTO ip_logs (
-                    ip_address,
-                    city,
-                    region,
-                    country,
-                    latitude,
-                    longitude
-                )
-                VALUES (?, ?, ?, ?, ?, ?)
-                """, (
-                    ip_data.get("ip_address"),
-                    ip_data.get("city"),
-                    ip_data.get("region"),
-                    ip_data.get("country"),
-                    ip_data.get("latitude"),
-                    ip_data.get("longitude"),
-                ),
+        # Store unique IP address details
+        cursor.execute("""
+            INSERT OR IGNORE INTO ip_logs (
+                ip_address,
+                city,
+                region,
+                country,
+                latitude,
+                longitude
             )
+            VALUES (?, ?, ?, ?, ?, ?)
+            """, (
+                ip_data.get("ip_address"),
+                ip_data.get("city"),
+                ip_data.get("region"),
+                ip_data.get("country"),
+                ip_data.get("latitude"),
+                ip_data.get("longitude"),
+            ),
+        )
 
     def hardware_logging(self, hardware: str) -> None:
         try:
