@@ -56,6 +56,7 @@ class HardwareManager:
         Ensures the camera is properly closed after use.
         """
         camera: Picamera2 = Picamera2()
+        camera.start()
         try:
             yield camera
         finally:
@@ -72,6 +73,7 @@ class HardwareManager:
             them as JPEG byte streams.
             """
             with self.get_camera() as camera:
+                camera.start()
                 self.hw_logger(hardware='Garage Camera')
                 while True:
                     try:

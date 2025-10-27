@@ -226,6 +226,9 @@ class dbManager:
                     ({hardware_query}) hq
                 ON
                     ms.session_id = hq.session_id
+                ORDER BY
+                    ms.login_date DESC,
+                    ms.login_time DESC
             """
 
             cursor.execute(final_query)
