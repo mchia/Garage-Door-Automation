@@ -49,46 +49,42 @@ class HardwareManager:
         else:
             return Response(status=200)
 
-    @contextmanager
-    def get_camera(self) -> Iterator[Picamera2]:
-        """
-        Context manager for the PiCamera2.
-        Ensures the camera is properly closed after use.
-        """
-        camera: Picamera2 = Picamera2()
-        camera.start()
-        try:
-            yield camera
-        finally:
-            camera.close()
+    def start_camera(self) -> None:
+        if self.picam2 is None:
+            self.picam2: Picamera2 = Picamera2()
+            self.picam2.awb_mode = 'fluorescent'
+            self.picam2.start()
 
     def cameraView(self) -> Response:
         """
-        Produces a live MJPEG stream from the camera.
+        Produces a live view of camera by calling generate_frames() to continuously return bytes.
+
+        Returns:
+            Response containing jpeg bytes and mimetype (Type of content contained in HTTP response)
+            'multipart/x-mixed-replace' sends multiple parts of the stream in the same connection and replaces the previous one.
+            'boundary=frame' is a delimiter, in this case the delimiter is frames.
         """
+
+        self.start_camera()
 
         def generate_frames() -> Iterator[bytes]:
             """
-            Generator function to capture frames continuously and yield
-            them as JPEG byte streams.
-            """
-            with self.get_camera() as camera:
-                camera.start()
-                self.hw_logger(hardware='Garage Camera')
-                while True:
-                    try:
-                        frame: np.ndarray = camera.capture_array()
-                        ret, jpeg = cv2.imencode('.jpg', frame)
-                        if not ret:
-                            continue
-                        frame_bytes: bytes = jpeg.tobytes()
-                        yield b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n'
-                    except Exception as e:
-                        print("Camera frame capture error:", e)
-                        break
+            Function to access piCamera module on Raspberry PI :
+                1) Capture a single frame as a NumPy array.
+                2) Encode the captured NumPy array as JPEG (Skip if encoding fails).
+                3) Converts encoded JPEG frames into bytes.
+                4) Yields each captured frame and sends back to camera to display live feed.
 
-        return Response(
-            generate_frames(),
-            mimetype='multipart/x-mixed-replace; boundary=frame',
-            direct_passthrough=True
-        )
+            Yields to retain function state unlike 'return' which has to restart.
+            Yield continues from previous yield until stoppped -> More memory efficient.
+            """
+            while True:
+                frame: np.ndarray = self.picam2.capture_array()
+                ret, jpeg = cv2.imencode('.jpg', frame)
+                if not ret:
+                    continue
+                frame_bytes: bytes = jpeg.tobytes()
+                yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+
+        return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
