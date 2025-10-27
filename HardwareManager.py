@@ -55,13 +55,11 @@ class HardwareManager:
         Context manager for the PiCamera2.
         Ensures the camera is properly closed after use.
         """
-        self.picam2: Picamera2 = Picamera2()
+        camera: Picamera2 = Picamera2()
         try:
-            yield self.picam2
+            yield camera
         finally:
-            if self.picam2:
-                self.picam2.close()
-                self.picam2 = None
+            camera.close()
 
     def cameraView(self) -> Response:
         """
