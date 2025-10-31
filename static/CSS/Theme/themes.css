@@ -22,6 +22,9 @@
     /* Door Camera */
     --mocha-camera: #f5c2e7;
 
+    /* Linux Camera */
+    --mocha-linux: #89b4fa;
+
     /* Admin Page */
     --mocha-admin: #f38ba8;
 }

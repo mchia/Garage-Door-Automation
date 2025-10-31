@@ -32,6 +32,18 @@
         </button>
     </div>
 
+    <!-- Button to launch linux camera live view -->
+    <div>
+        <button id="launchLinuxCam" class="button linux" onclick="location.href='/linuxCam'">
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Garage"></use>
+            </svg>
+            <svg class="svgIcons">
+                <use href="{{ url_for('static', filename='SVG/icons.svg') }}#Linux"></use>
+            </svg>
+        </button>
+    </div>
+
     <div>
         <button id="launchLogs" class="button logs" onclick="location.href='/logbook'">
             <svg class="svgIcons">

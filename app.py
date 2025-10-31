@@ -1,6 +1,6 @@
 from user_agents import parse
 from dotenv import load_dotenv
-from typing import Any, Optional
+from typing import Any, Optional, Union, Generator
 import os, requests, dbManager as dbm, HardwareManager as hwm
 from flask import (
     Flask,
@@ -21,6 +21,7 @@ class GarageAutomation:
 
         load_dotenv()
         self.app.secret_key = os.getenv(key='SECRET_KEY')
+        self.linuxIP: str = os.getenv(key='LINUX_IP')
         self.app.add_url_rule(rule='/', view_func=self.launchPage)
         self.app.add_url_rule(rule="/validateLogin", view_func=self.db.validateLogin, methods=["POST"])
         self.app.add_url_rule(rule="/addUser", view_func=self.db.addUser, methods=["POST"])
@@ -30,7 +31,9 @@ class GarageAutomation:
         self.app.add_url_rule(rule='/gpioToggle', view_func=self.hw.gpioToggle, methods=["GET"])
         self.app.add_url_rule(rule='/liveView', view_func=self.launchLiveView)
         self.app.add_url_rule(rule='/logbook', view_func=self.launchLogs)
-        self.app.add_url_rule(rule='/cameraView', view_func=self.hw.cameraView)
+        # self.app.add_url_rule(rule='/cameraView', view_func=self.hw.cameraView)
+        self.app.add_url_rule('/linuxCam', view_func=self.launchLinuxCam)
+        self.app.add_url_rule('/linuxCamStream', view_func=self.intialiseLinuxCam)
         self.app.add_url_rule(rule='/admin', view_func=self.launchAdmin)
 
     # HTML Views #
@@ -79,6 +82,27 @@ class GarageAutomation:
             )
         else:
             return redirect("/")
+
+    def launchLinuxCam(self) -> str:
+        if not session.get("logged_in"):
+            return redirect("/")
+
+        return render_template(template_name_or_list='linuxCam.html')
+
+    def intialiseLinuxCam(self) -> Response:
+        """
+        Proxy the MJPG stream from the Linux laptop, only if the user is logged in.
+        """
+        if not session.get("logged_in"):
+            return redirect("/")
+
+        def generate() -> Generator[bytes, None, None]:
+            with requests.get(f"http://{self.linuxIP}:8080/?action=stream", stream=True) as r:
+                for chunk in r.iter_content(chunk_size=1024):
+                    if chunk:
+                        yield chunk
+
+        return Response(generate(), content_type='multipart/x-mixed-replace; boundary=--boundarydonotcross')
 
     # IP & User Metadata #
     def ip_find(self) -> dict[str, str | float | None]:

@@ -32,6 +32,12 @@
     margin-bottom: 10px;
 }
 
+.button.linux {
+    background-color: var(--mocha-linux);
+    color: var(--mocha-linux);
+    margin-bottom: 10px;
+}
+
 .button.logs {
     background-color: var(--mocha-logs);
     color: var(--mocha-surface);
