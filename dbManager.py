@@ -190,7 +190,7 @@ class dbManager:
             with open("db/logs.sql") as f:
                 main_sql: str = f.read().strip()
 
-            cursor.execute("SELECT DISTINCT hardware FROM hardware_logs")
+            cursor.execute("SELECT DISTINCT hardware FROM hardware")
             hardware_types: list[str] = [row[0] for row in cursor.fetchall()]
 
             # Escape single quotes in hardware names
@@ -209,6 +209,8 @@ class dbManager:
                 FROM hardware_logs
                 GROUP BY session_id
             """
+
+            print(f"SELECT * FROM ({hardware_query}) LIMIT 1")
 
             # Exclude session_id columns from both queries
             cursor.execute(f"SELECT * FROM ({main_sql}) LIMIT 1")
@@ -230,6 +232,8 @@ class dbManager:
                     ms.login_date DESC,
                     ms.login_time DESC
             """
+
+            print(final_query)
 
             cursor.execute(final_query)
             rows: list[Any] = cursor.fetchall()
