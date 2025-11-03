@@ -5,8 +5,8 @@ from flask import Response, jsonify, request, session
 from typing import Generator, Optional, Any, Callable
 
 class dbManager:
-    def __init__(self, ip_dict: Callable[[], dict], user_dict: Callable[[], dict]) -> None:
-        self.db: str = "db/users.db"
+    def __init__(self, ip_dict: Callable[[], dict], user_dict: Callable[[], dict], db: str) -> None:
+        self.db: str = db
         self.ip_dict: Callable[[], dict] = ip_dict
         self.user_dict: Callable[[], dict] = user_dict
         self.user_id: Optional[str] = None
@@ -78,9 +78,15 @@ class dbManager:
             # Return control to self.db_connect()
 
     def user_metadata(self) -> dict:
+        """
+        Method that returns a dictionary from self.user_dict via Callable.
+        """
         return self.user_dict()
     
     def ip_metadata(self) -> dict:
+        """
+        Method that returns a dictionary from self.ip_dict via Callable.
+        """
         return self.ip_dict()
 
     def store_login_data(self, cursor: sqlite3.Cursor) -> None:
@@ -154,6 +160,13 @@ class dbManager:
         )
 
     def hardware_logging(self, hardware: str) -> None:
+        """
+        Method to write hardware access to database.
+
+        Parameters:
+            hardware : str
+                Hardware that is triggered via front end pages.
+        """
         try:
             with self.db_connect() as cursor:
                 cursor.execute("""
@@ -210,8 +223,6 @@ class dbManager:
                 GROUP BY session_id
             """
 
-            print(f"SELECT * FROM ({hardware_query}) LIMIT 1")
-
             # Exclude session_id columns from both queries
             cursor.execute(f"SELECT * FROM ({main_sql}) LIMIT 1")
             main_cols: list[str] = [c[0] for c in cursor.description if c[0] != "session_id"]
@@ -232,8 +243,6 @@ class dbManager:
                     ms.login_date DESC,
                     ms.login_time DESC
             """
-
-            print(final_query)
 
             cursor.execute(final_query)
             rows: list[Any] = cursor.fetchall()

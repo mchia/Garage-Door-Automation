@@ -18,10 +18,9 @@ class GarageAutomation:
         self.app.secret_key = os.getenv(key='SECRET_KEY')
 
         # Initialise Database and Hardware Managers
-        self.db: dbm.dbManager = dbm.dbManager(ip_dict=self.ip_find, user_dict=self.user_info)
+        self.db: dbm.dbManager = dbm.dbManager(ip_dict=self.ip_find, user_dict=self.user_info, db=os.getenv(key='DB'))
         self.hw: hwm.HardwareManager = hwm.HardwareManager(hw_logger=self.db.hardware_logging, linux_ip=os.getenv(key='LINUX_IP'))
 
-        
         self.app.add_url_rule(rule='/', view_func=self.launchPage)
         self.app.add_url_rule(rule="/validateLogin", view_func=self.db.validateLogin, methods=["POST"])
         self.app.add_url_rule(rule="/addUser", view_func=self.db.addUser, methods=["POST"])
@@ -68,6 +67,10 @@ class GarageAutomation:
         return render_template(template_name_or_list='liveView.html')
 
     def launchLogs(self) -> str:
+        """
+        Method to redirect user to access log page if logged_in flag is False.
+        Otherwise user will be redirected to the dashboard.
+        """
         if not session.get("logged_in"):
             return redirect("/")
 
@@ -75,6 +78,10 @@ class GarageAutomation:
         return render_template(template_name_or_list='logs.html', rows=rows, hw_cols=hw_cols)
 
     def launchAdmin(self) -> str|Response:
+        """
+        Method to redirect user to admin panel page if logged_in flag is False and user is admin.
+        Otherwise user will be redirected to the dashboard.
+        """
         if self.db.role == 'admin':
             return render_template(
                 template_name_or_list='admin.html',
@@ -84,6 +91,10 @@ class GarageAutomation:
             return redirect("/")
 
     def launchLinuxCam(self) -> str:
+        """
+        Method to redirect user to live view from Linux Laptop if logged_in flag is False.
+        Otherwise user will be redirected to the dashboard.
+        """
         if not session.get("logged_in"):
             return redirect("/")
 
@@ -160,9 +171,6 @@ class GarageAutomation:
             "device": device
         }
 
-    def action_info(self) -> dict[Optional[str]]:
-        pass
-
     # Run
     def run(self) -> None: 
         """
@@ -172,6 +180,9 @@ class GarageAutomation:
         self.app.run(host='0.0.0.0', port=5000, debug=False)
 
 def create_app() -> Flask:
+    """
+    Method to create instance of Flask app.
+    """
     garage: GarageAutomation = GarageAutomation()
     return garage.app
 

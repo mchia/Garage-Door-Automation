@@ -94,6 +94,7 @@ class HardwareManager:
     def intialiseLinuxCam(self) -> Response:
         """
         Proxy the MJPG stream from the Linux laptop.
+        Make request to linux laptop on LAN network, to retrieve video feed.
         """
         def generate() -> Generator[bytes, None, None]:
             with requests.get(f"http://{self.linux_ip}:8080/?action=stream", stream=True) as r:
