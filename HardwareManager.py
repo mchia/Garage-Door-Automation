@@ -8,9 +8,10 @@ from contextlib import contextmanager
 from typing import Iterator, Optional, Callable, Generator
 
 class HardwareManager:
-    def __init__(self, relay_pin: int = 17, linux_ip: str = None, hw_logger: Callable[[str, str], None] = None) -> None:
+    def __init__(self, relay_pin: int = 17, linux_ip: str = None, piZero_ip: str = None, hw_logger: Callable[[str, str], None] = None) -> None:
         self.relay_pin: int = relay_pin
         self.linux_ip: str = linux_ip
+        self.piZero_ip: str = piZero_ip
         self.picam2: Optional[Picamera2] = None
         self.hw_logger: Callable[[str, str], None] = hw_logger
 
@@ -105,3 +106,20 @@ class HardwareManager:
         self.hw_logger(hardware='Living Room Camera')
 
         return Response(generate(), content_type='multipart/x-mixed-replace; boundary=--boundarydonotcross')
+
+    def initialisePiZeroCam(self) -> Response:
+        """
+        Proxy the MJPG stream from the Pi Zero Camera.
+        """
+
+        def generate() -> Generator[bytes, None, None]:
+            url = f"http://{self.piZero_ip}:8080/camera"
+            with requests.get(url, stream=True) as r:
+                for chunk in r.iter_content(chunk_size=1024):
+                    if chunk:
+                        yield chunk
+
+        self.hw_logger(hardware='Kitchen Camera')
+
+        return Response(generate(),
+                        content_type='multipart/x-mixed-replace; boundary=frame')

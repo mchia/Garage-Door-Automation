@@ -18,8 +18,16 @@ class GarageAutomation:
         self.app.secret_key = os.getenv(key='SECRET_KEY')
 
         # Initialise Database and Hardware Managers
-        self.db: dbm.dbManager = dbm.dbManager(ip_dict=self.ip_find, user_dict=self.user_info, db=os.getenv(key='DB'))
-        self.hw: hwm.HardwareManager = hwm.HardwareManager(hw_logger=self.db.hardware_logging, linux_ip=os.getenv(key='LINUX_IP'))
+        self.db: dbm.dbManager = dbm.dbManager(
+            ip_dict=self.ip_find,
+            user_dict=self.user_info,
+            db=os.getenv(key='DB')
+        )
+        self.hw: hwm.HardwareManager = hwm.HardwareManager(
+            hw_logger=self.db.hardware_logging,
+            linux_ip=os.getenv(key='LINUX_IP'),
+            piZero_ip=os.getenv(key='PIZERO_IP')
+        )
 
         self.app.add_url_rule(rule='/', view_func=self.launchPage)
         self.app.add_url_rule(rule="/validateLogin", view_func=self.db.validateLogin, methods=["POST"])
@@ -33,6 +41,8 @@ class GarageAutomation:
         self.app.add_url_rule(rule='/cameraView', view_func=self.hw.cameraView)
         self.app.add_url_rule('/linuxCam', view_func=self.launchLinuxCam)
         self.app.add_url_rule('/linuxCamStream', view_func=self.hw.intialiseLinuxCam)
+        self.app.add_url_rule('/PIZeroCam', view_func=self.launchPIZeroCam)
+        self.app.add_url_rule('/piZeroCamStream', view_func=self.hw.initialisePiZeroCam)
         self.app.add_url_rule(rule='/admin', view_func=self.launchAdmin)
 
     # HTML Views #
@@ -99,6 +109,16 @@ class GarageAutomation:
             return redirect("/")
 
         return render_template(template_name_or_list='linuxCam.html')
+
+    def launchPIZeroCam(self) -> str:
+        """
+        Method to redirect user to live view from Linux Laptop if logged_in flag is False.
+        Otherwise user will be redirected to the dashboard.
+        """
+        if not session.get("logged_in"):
+            return redirect("/")
+
+        return render_template(template_name_or_list='kitchenView.html')
 
     # IP & User Metadata #
     def ip_find(self) -> dict[str, str | float | None]:

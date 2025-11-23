@@ -25,6 +25,9 @@
     /* Linux Camera */
     --mocha-linux: #89b4fa;
 
+    /* piZero Camera */
+    --mocha-kitchen: #f2cdcd;
+
     /* Admin Page */
     --mocha-admin: #f38ba8;
 }

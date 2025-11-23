@@ -38,6 +38,12 @@
     margin-bottom: 10px;
 }
 
+.button.piZero {
+    background-color: var(--mocha-kitchen);
+    color: var(--mocha-kitchen);
+    margin-bottom: 10px;
+}
+
 .button.logs {
     background-color: var(--mocha-logs);
     color: var(--mocha-surface);
